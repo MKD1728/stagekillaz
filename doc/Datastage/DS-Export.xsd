@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v5 rel. 2 U (http://www.xmlspy.com) by Ewan Paton (Ascential Software Ltd) -->
+<!--
+****************************************************************************
+* DSExportSchema.xsd
+* Copyright 2003, Ascential Software Corporation All rights reserved.
+* This is unpublished proprietary source code of Ascential Software Corporation
+* The copyright notice above does not evidence any actual or intended
+* publication of such source code.
+*
+****************************************************************************
+*
+* Maintenance log - insert the most recent change descriptions at top
+*
+* Date      GTAR# Who Description
+* 01 Apr 03 18615 EAP fixed namespace change
+* 25 Mar 03 18615 EAP Changed namespace to www.ascentialsoftware.com
+* 03 Mar 03 18615 EAP Updated to http://www.w3.org/2001/XMLSchema
+* 16 Feb 01 31232 AJH Added shared container support
+* 14 Jan 00 26629 LDG First created.
+****************************************************************************
+*
+* XML Schema in W3C format to describe DataStage Repository Export XML.
+*
+****************************************************************************
+-->
+<xs:schema targetNamespace="http://www.ascentialsoftware.com/DataStage/export" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dsx="http://www.ascentialsoftware.com/DataStage/export" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="DSExport">
+		<xs:annotation>
+			<xs:documentation>XML Document containing a collection of Exported DataStage objects</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="Header">
+					<xs:annotation>
+						<xs:documentation>Header element contains source and version information</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="CharacterSet" type="xs:string"/>
+						<xs:attribute name="ExportingTool" type="xs:string"/>
+						<xs:attribute name="ToolVersion" type="xs:string" use="required"/>
+						<xs:attribute name="ServerName" type="xs:string"/>
+						<xs:attribute name="ToolInstanceID" type="xs:string"/>
+						<xs:attribute name="Date" type="xs:string"/>
+						<xs:attribute name="Time" type="xs:string"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Job" type="dsx:JobType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Job element contains definition of a Job</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="SharedContainer" type="dsx:JobType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>SharedContainer element contains definition of a Shared Container</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="DataElements" type="dsx:ProjectObjectsType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>DataElements element contains definition of a Data Element</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Routines" type="dsx:ProjectObjectsType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Routines element contains definition of a Routine</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="StageTypes" type="dsx:ProjectObjectsType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>StageTypes element contains definition of a Stage Type</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="TableDefinitions" type="dsx:ProjectObjectsType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>TableDefinitions element contains definition of a Table definition</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Transforms" type="dsx:ProjectObjectsType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Transforms element contains definition of a Transform</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="MachineProfiles" type="dsx:ProjectObjectsType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>MachineProfiles element contains definition of a Machine Profile</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="IMSDatabase" type="dsx:ProjectObjectsType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>IMSDatabase element contains definition of a IMS Database</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="IMSViewset" type="dsx:ProjectObjectsType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>IMSViewset element contains definition of a IMS Viewset</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Record">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice maxOccurs="unbounded">
+					<xs:element ref="dsx:Property"/>
+					<xs:element ref="dsx:Collection"/>
+				</xs:choice>
+			</xs:sequence>
+			<xs:attribute name="Identifier" type="xs:string" use="required"/>
+			<xs:attribute name="DateModified" type="xs:string"/>
+			<xs:attribute name="TimeModified" type="xs:string"/>
+			<xs:attribute name="Type" type="xs:string" use="required"/>
+			<xs:attribute name="Readonly" type="xs:boolean" default="0"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Property">
+		<xs:complexType mixed="true">
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="ListItem">
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="DisplayName" type="xs:string" use="required"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="DSXML">
+					<xs:complexType mixed="true"/>
+				</xs:element>
+			</xs:choice>
+			<xs:attribute name="Name" type="xs:string" use="required"/>
+			<xs:attribute name="PreFormatted" default="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="0"/>
+						<xs:enumeration value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Collection">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="SubRecord" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="dsx:Property" minOccurs="0" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="Name" type="xs:string" use="required"/>
+			<xs:attribute name="Type" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="JobType">
+		<xs:sequence>
+			<xs:element ref="dsx:Record" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="Identifier" type="xs:string" use="required"/>
+		<xs:attribute name="DateModified" type="xs:string"/>
+		<xs:attribute name="TimeModified" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="ProjectObjectsType">
+		<xs:sequence>
+			<xs:element ref="dsx:Record" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
