@@ -67,7 +67,7 @@ public class Variables
       for (int i = 0; i < nodes.getLength(); i++) {
         Node subRecord = nodes.item(i);
 
-        final String name = DataStageReader.propertyValue(subRecord, "Prompt");
+        final String name = DataStageReader.propertyValue(subRecord, "Name");
         final String prompt = DataStageReader.propertyValue(subRecord, "Prompt");
         final String def = DataStageReader.propertyValue(subRecord, "Default");
 
