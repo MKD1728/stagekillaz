@@ -28,12 +28,13 @@ import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 import org.apache.log4j.Logger;
 import org.apache.log4j.BasicConfigurator;
-import com.ascentialsoftware.dataStage.export.DSExportDocument.DSExport;
 import com.starschema.stagekillaz.ODI.Manager;
 import com.starschema.stagekillaz.ODI.ConnectionArgs;
+import org.w3c.dom.Document;
 
 public class StageKillaz
 {
+	private static final String DEFAULT_FOLDER = "Migrated jobs";
 
   static StageKillaz stageKillaz;
   static Logger logger = Logger.getLogger(StageKillaz.class);
@@ -59,13 +60,14 @@ public class StageKillaz
   public void execute(String[] args)
   {
     String inputFile = null;
+    String folderName = DEFAULT_FOLDER;
     ConnectionArgs connectionArgs = new ConnectionArgs();
 
     // Configure logger
     BasicConfigurator.configure();
 
     // Configure longop
-    LongOpt[] longopts = new LongOpt[9];
+    LongOpt[] longopts = new LongOpt[10];
     StringBuffer sb = new StringBuffer();
     longopts[0] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
     longopts[1] = new LongOpt("inputfile", LongOpt.REQUIRED_ARGUMENT, sb, 'i');
@@ -76,8 +78,9 @@ public class StageKillaz
     longopts[6] = new LongOpt("reposname", LongOpt.REQUIRED_ARGUMENT, sb, 'n');
     longopts[7] = new LongOpt("odiuser", LongOpt.REQUIRED_ARGUMENT, sb, 'u');
     longopts[8] = new LongOpt("odipassword", LongOpt.REQUIRED_ARGUMENT, sb, 'p');
+    longopts[9] = new LongOpt("folder", LongOpt.REQUIRED_ARGUMENT, sb, 'f');
 
-    Getopt g = new Getopt("stagekillaz", args, "-hi:r:d:s:a:n:u:p:", longopts);
+    Getopt g = new Getopt("stagekillaz", args, "-hi:r:d:s:a:n:u:p:f:", longopts);
     int c;
 
     // parse arguments
@@ -105,8 +108,9 @@ public class StageKillaz
         connectionArgs.setOdiUsername(g.getOptarg());
       } else if (c == 'p') {
         connectionArgs.setOdiPassword(g.getOptarg());
+      } else if (c == 'f') {
+        folderName = g.getOptarg();
       }
-
     } // while
 
     // check if input file is present
@@ -125,7 +129,7 @@ public class StageKillaz
 
     // Parse input file
     DataStageReader reader = new DataStageReader();
-    DSExport dsExport = null;
+    Document dsExport = null;
     try {
       // parse input file
       dsExport = reader.loadFile(inputFile);
@@ -135,7 +139,7 @@ public class StageKillaz
     }
 
     // Managers
-    Manager odiMgr = new Manager(dsExport, connectionArgs);
+    Manager odiMgr = new Manager(dsExport, connectionArgs,folderName);
     try {
       // Generate ODI project
       odiMgr.run();
@@ -166,5 +170,6 @@ public class StageKillaz
     System.out.println("\treposname\tWorking repository name (optional)");
     System.out.println("\todiuser\t\tODI user name");
     System.out.println("\todipassword\tODI password");
+    System.out.println("\tfolder\tFolder in ODI project (optional)");
   }
 }

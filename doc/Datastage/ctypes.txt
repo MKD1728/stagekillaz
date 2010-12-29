@@ -1,0 +1,150 @@
+[SEQUENCE] 
+CCondition            =      ; Branch the execution of a sequence depending on a user defined condition 
+CEndLoopActivity      =      ; Sequence EndLoop 
+CExceptionHandler     =      ; Capture general job exceptions 
+CExecCommandActivity  =      ; Execute an operating system command 
+CJobActivity          =      ; Execute a DataStage job 
+CNotificationActivity =      ; Send an email notification based on user entered criterion 
+CRoutineActivity      =      ; Execute an existing routine 
+CSequencer            =      ; Synchronize the control flow of multiple activities in a job sequence 
+CStartLoopActivity    =      ; Sequence StartLoop 
+CTerminatorActivity   =      ; Sequence Terminator 
+CUserVarsActivity     =      ; Sequence UserVariables 
+CWaitForFileActivity  =      ; Wait for the specified file to appear 
+
+[SERVER] 
+AGGREGATOR         = **      ; Form groups or perform other aggregate functions 
+BCPLOAD            = **      ; Sybase & SQL Server bulk loader 
+CCollector         = **      ; Merge up to 64 links into single output link 
+CFF                = **      ; Complex Flat File stage. 
+CHashedFileStage   = **      ; Typically a keyed reference file 
+CInterProcess      = **      ; Communication channel between stages 
+CInternal          = **      ; Internal Stage 
+CODBCStage         = **      ; ODBC data access 
+CPartitioner       = **      ; Partition data out to multiple links 
+CSeqFileStage      = **      ; Sequential data access 
+CUDT6Stage         = **      ; UniData 6 data access 
+CUniDataStage      = **      ; UniData data access 
+CUvStage           = **      ; UniVerse data access 
+DRS                = **      ; DRS stage (dynamic RDBMS) 
+DSDB2              = **      ; IBM DB2 UDB data access 
+DstxMap            = **      ; DataStage TX Map Stage 
+Folder             = **      ; Read or write data as files in a directory 
+INFBLK10           = **      ; Informix Bulk Loader 
+IQBulk12           = **      ; Sybase IQ 12 Bulk Loader 
+InfmxCLI           = **      ; Informix data access 
+MERGE              = **      ; Merge data access 
+ORABULK            = **      ; Bulk loader 
+ORAOCI9            = **      ; Oracle OCI stage version 1.1 
+ORAOCIBL           = **      ; Oracle 8.1 Bulk Loader 
+Pivot              = **      ; Pivot Plugin version 1.0.0 
+RowMerger          = **      ; Row Merger Active Plug-in Stage 
+RowSplitter        = **      ; Row Splitter Active Plug-in Stage 
+STP                = **      ; The Stored Procedure stage. 
+SYBASEOC           = **      ; Sybase data access 
+TDMLoad            = **      ; Teradata MultiLoad/TPump/FastExport Stage. 
+Terabulk           = **      ; Teradata Bulk Loader. 
+Teradata           = **      ; Teradata data access 
+UDBLoad            = **      ; IBM DB2 UDB Bulk Loader 
+XMLInput           = **      ; XML Input Stage 
+XMLOutput          = **      ; XML Output Stage 
+XMLTransformer     = **      ; XML Transformer Stage 
+XPSLoad            = **      ; Informix XPS Bulk Loader 
+ftp                = **      ; FTP data access 
+rdbload            = **      ; Redbrick Bulk Loader 
+sort               = **      ; Sort 
+
+[PARALLEL] 
+Link                    = lk      ; Link 
+Container               = sc      ; Container 
+CTransformerStage       = tx      ; Enter data transformations 
+DRSPX                   = dr      ; DRS stage (dynamic RDBMS) 
+DSDB2PX                 = **      ; IBM DB2 UDB data access 
+DstxMapPX               = **      ; DataStage TX Map Stage 
+INFBLK10PX              = **      ; Informix Bulk Loader 
+IQBulk12PX              = **      ; Sybase IQ 12 Bulk Loader 
+InfmxCLIPX              = **      ; Informix data access 
+ORAOCIBLPX              = ob      ; Oracle 8.1 Bulk Loader 
+PivotPX                 = pv      ; Pivot Plugin version 1.0.0 
+PxAggregator            = ag      ; Form groups or perform other aggregate functions 
+PxCFF                   = cf      ; Complex flat file access 
+PxChangeApply           = ca      ; Apply change operations to "before" data set 
+PxChangeCapture         = cc      ; Capture changes between "before" and "after" data sets 
+PxColumnExport          = ce      ; Combine columns into a single binary or string column 
+PxColumnGenerator       = cg      ; Create new columns to add to incoming rows 
+PxColumnImport          = ci      ; Parse apart a single binary or string column into multiple columns 
+PxCombineRecords        = cr      ; Combine records with identical keys into single record 
+PxCompare               = cm      ; Compares two pre-sorted input data sets 
+PxCompress              = co      ; Compress data set to binary stream 
+PxCopy                  = cp      ; Copy input to zero or more outputs 
+PxDB2                   = **      ; DB2/UDB data access 
+PxDataSet               = ds      ; DataStage persistent data set access 
+PxDecode                = dc      ; Decode binary data stream using an operating system command 
+PxDifference            = di      ; Compare "before" and "after" data sets 
+PxEncode                = en      ; Encode data stream using operating system command 
+PxExpand                = ex      ; Expand binary stream to data set 
+PxExternalFilter        = ef      ; Call an operating system command as a filter 
+PxExternalSource        = es      ; Call a program that acts as a data source 
+PxExternalTarget        = et      ; Call a program that acts as a data target 
+PxFTP                   = ft      ; FTP file access 
+PxFileSet               = fs      ; File Set access 
+PxFilter                = fi      ; Assign input rows to output links based on constraint 
+PxFunnel                = fn      ; Combine multiple inputs to single output 
+PxGeneric               = ge      ; Call a user written operator 
+PxHead                  = hd      ; Copy specified number of input rows to output 
+PxInformixXPS           = **      ; Informix data access 
+PxJoin                  = jn      ; Join two inputs (inner, outer or full join) to create one output 
+PxLookup                = lu      ; Lookup on one or more sources or one (sparse) lookup to a direct DB source 
+PxLookupFileSet         = lf      ; File Set used as lookup or reference 
+PxMakeSubRec            = ms      ; Convert vector (array) columns to vector (array) of subrecords 
+PxMakeVect              = mv      ; Convert columns into vector (array) of columns 
+PxMerge                 = mg      ; Combine master with one or more update inputs 
+PxModify                = mo      ; Change column attributes and/or number of columns 
+PxNetezza               = **      ; Netezza data access 
+PxOdbc                  = od      ; ODBC data access 
+PxOracle                = or      ; Oracle data access 
+PxPeek                  = pk      ; Print row column values to either the job log or to a separate output link 
+PxPromoteSubRec         = ps      ; Promote columns of a subrecord to top-level 
+PxRemDup                = rd      ; Eliminate adjacent rows with identical values for the key column(s) 
+PxRowGenerator          = rg      ; Produce a set of mock data based on the specified meta data 
+PxSVTransformer         = **      ; Enter data transformations (BASIC) 
+PxSample                = sa      ; Randomly subset input and distribute among outputs 
+PxSequentialFile        = sf      ; Sequential file access 
+PxSort                  = so      ; Sort rows by ascending/descending column value 
+PxSplitSubRec           = ss      ; Convert vector (array) of subrecords to top-level vectors 
+PxSplitVect             = sv      ; Promote vector (array) column to top-level columns 
+PxSurrogateKeyGenerator = sk      ; Create new surrogate key columns to add to incoming rows 
+PxSwitch                = sw      ; Assign input rows to output links based on selector values 
+PxSybase                = **      ; SYBASE data access 
+PxTail                  = tl      ; Copy specified number of trailing input rows to output 
+PxTeradata              = **      ; Teradata data access 
+PxWriteRangeMap         = wr      ; Create map to use with "range" partitioning 
+STPPX                   = sp      ; The Stored Procedure stage. 
+SYBASEOCPX              = **      ; Sybase data access 
+TDMLoadPX               = **      ; Teradata MultiLoad/TPump/FastExport Stage. 
+TerabulkPX              = **      ; Teradata Bulk Loader. 
+TeradataPX              = **      ; Teradata data access 
+UDBLoadPX               = **      ; IBM DB2 UDB Bulk Loader 
+XMLInputPX              = xi      ; XML Input Stage 
+XMLOutputPX             = xo      ; XML Output Stage 
+XMLTransformerPX        = xt      ; XML Transformer Stage 
+XPSLoadPX               = **      ; Informix XPS Bulk Loader 
+ftpPX                   = ft      ; FTP data access 
+rdbloadPX               = **      ; Redbrick Bulk Loader 
+
+CCustomInput 
+CHashedInput 
+CTrxOutput 
+CHashedOutput 
+CCustomOutput 
+CJSJobActivity 
+CJobDefn 
+CCustomStage 
+CTrxInput 
+CContainerView 
+CJSActivityOutput 
+CJSActivityInput 
+CODBCInput 
+CSeqInput 
+CContainerDefn 
+CSeqOutput 

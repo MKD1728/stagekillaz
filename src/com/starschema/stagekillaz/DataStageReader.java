@@ -28,10 +28,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
-import org.apache.xmlbeans.XmlOptions;
 import org.apache.log4j.Logger;
-import com.ascentialsoftware.dataStage.export.DSExportDocument;
-import com.ascentialsoftware.dataStage.export.DSExportDocument.DSExport;
+import java.io.IOException;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+import javax.xml.parsers.*;
+import javax.xml.xpath.*;
 
 /**
  *
@@ -41,34 +43,63 @@ public class DataStageReader
 {
 
   static Logger logger = Logger.getLogger(DataStageReader.class);
+  static final XPathFactory factory = XPathFactory.newInstance();
+  static final XPath xpath = factory.newXPath();
+  static Document doc = null;
 
-  public DSExport loadFile(String filePath) throws KillaException
+  public static NodeList executeXPath(String query) throws XPathExpressionException, KillaException
   {
-    File inputFile = new File(filePath);
-    Map nsSubst = new HashMap();
+    if ( doc == null )
+      throw new KillaException("Document is not initalized yet.");
+    
+    XPathExpression expr = xpath.compile(query);
 
+    return (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+  }
+
+  public Document loadFile(String filePath) throws KillaException
+  {
+    
     try {
-      nsSubst.put("", "http://www.ascentialsoftware.com/DataStage/export");
-      XmlOptions parseOptions = new XmlOptions();
-      parseOptions.setLoadSubstituteNamespaces(nsSubst);
+      DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+      domFactory.setNamespaceAware(true); // never forget this!
 
-      DSExportDocument dsExportDocument = DSExportDocument.Factory.parse(inputFile, parseOptions);
-      DSExport dse = dsExportDocument.getDSExport();
+      DocumentBuilder builder = domFactory.newDocumentBuilder();
+      doc = builder.parse(filePath);
+
+      NodeList nodes = executeXPath( "//Header");
 
       logger.info("\"" + filePath + "\" has been successfuly parsed. File was created by "
-              + dse.getHeaderArray(0).getExportingTool()
-              + ", v" + dse.getHeaderArray(0).getToolVersion()
-              + ", from server " + dse.getHeaderArray(0).getServerName()
-              + " at " + dse.getHeaderArray(0).getDate().toString()
-              + " " + dse.getHeaderArray(0).getTime().toString());
+              + nodes.item(0).getAttributes().getNamedItem("ExportingTool").getNodeValue()
+              + ", v" + nodes.item(0).getAttributes().getNamedItem("ToolVersion").getNodeValue()
+              + ", from server " + nodes.item(0).getAttributes().getNamedItem("ServerName").getNodeValue()
+              + " at " + nodes.item(0).getAttributes().getNamedItem("Date").getNodeValue()
+              + " " + nodes.item(0).getAttributes().getNamedItem("Time").getNodeValue());
 
-      return dse;
-    } catch (org.apache.xmlbeans.XmlException exc) {
-      throw new KillaException("Error in DataStage export file: " + exc.getMessage(),
-              exc);
+      return doc;
     } catch (IOException exc) {
       throw new KillaException("Can not load DataStage export file: " + exc.getMessage(),
               exc);
+    } catch (Exception exc) {
+      throw new KillaException("Error in DataStage export file: " + exc.getMessage(),
+              exc);
     }
+  }
+
+  public static String propertyValue(Node node, String property) throws KillaException
+  {
+    Node ret;
+
+    try {
+      ret = (Node) xpath.evaluate("./Property[@Name='" + property + "']", node, XPathConstants.NODE);
+    } catch (XPathExpressionException exc) {
+      throw new KillaException("Cannot get property: " + property
+              + "," + exc.getMessage(), exc);
+    }
+
+    if ( ret == null )
+      return "";
+    
+    return ret.getTextContent();
   }
 }

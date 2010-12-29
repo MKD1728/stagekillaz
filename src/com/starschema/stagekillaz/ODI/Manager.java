@@ -25,23 +25,27 @@
 package com.starschema.stagekillaz.ODI;
 
 // common stuff
-import com.ascentialsoftware.dataStage.export.DSExportDocument.DSExport;
 import com.starschema.stagekillaz.KillaException;
 import org.apache.log4j.Logger;
 // ODI
 import oracle.odi.core.config.OdiConfigurationException;
 import oracle.odi.core.security.AuthenticationException;
 import oracle.odi.core.OdiInstance;
+import oracle.odi.core.persistence.IOdiEntityManager;
 import oracle.odi.core.persistence.transaction.ITransactionStatus;
-import oracle.odi.core.persistence.transaction.support.TransactionCallbackWithoutResult;
+import oracle.odi.core.persistence.transaction.support.ITransactionCallback;
 import oracle.odi.core.persistence.transaction.support.TransactionTemplate;
+import oracle.odi.domain.finder.IFinder;
+import oracle.odi.domain.project.OdiFolder;
 import oracle.odi.domain.project.OdiProject;
+import oracle.odi.domain.project.finder.IOdiProjectFinder;
+import org.w3c.dom.Document;
 
 public class Manager
 {
 
   /** parsed DataStage export document in XMLBean format */
-  protected static DSExport dsExport;
+  protected static Document dsExport;
   /** parsed connection arguments for ODI */
   protected static ConnectionArgs connectionArgs;
   /** connection handler to ODI repository */
@@ -50,27 +54,40 @@ public class Manager
   protected OdiInstance odiInstance;
   /** does we connected to ODI? */
   protected boolean isODIConnected;
+  /** Project handler in ODI */
+  protected OdiProject project;
+  /** ODI Folder name */
+  protected String folderName;
+  /** ODI Folder handler */
+  protected OdiFolder folder;
+
+  static final String PROJECT_DESC = "Migrated DataStage Jobs";
+  static final String PROJECT_CODE = "PROJECT_DS";
 
   /* log4j logger */
   static Logger logger = Logger.getLogger(Manager.class);
 
-  public Manager(DSExport dse, ConnectionArgs ca)
+  public Manager(Document dse, ConnectionArgs ca, String fn)
   {
     dsExport = dse;
     connectionArgs = ca;
     isODIConnected = false;
+    folderName = fn;
   }
 
   public void run() throws KillaException
   {
 
     try {
+
       // 1. Log on to ODI
       connectToRepository();
 
       // 2. Create/open the project
       openProject();
 
+      // 3. Generate variables
+      Variables.storeVariables(dsExport, odiInstanceHandle, project, folder);
 
     } catch (Exception exc) {
       if (exc instanceof KillaException)
@@ -88,17 +105,31 @@ public class Manager
   {
 
     TransactionTemplate tx = new TransactionTemplate(odiInstance.getTransactionManager());
-    tx.execute(new TransactionCallbackWithoutResult()
+    tx.execute(new ITransactionCallback()
     {
 
-      protected void doInTransactionWithoutResult(ITransactionStatus pStatus)
+      public Object doInTransaction(ITransactionStatus pStatus)
       {
-        OdiProject project = new OdiProject("Project For DataStage", "PROJECT_DS");
-        odiInstance.getTransactionalEntityManager().persist(project);
+        IOdiEntityManager entityManager = odiInstance.getTransactionalEntityManager();
 
+        logger.info("Check if the project already exists");
 
+        // Open project
+        project = ((IOdiProjectFinder)entityManager.getFinder(OdiProject.class)).findByCode(PROJECT_CODE);
+        if (project != null)
+          return null;
 
-        odiInstance.getTransactionalEntityManager().remove(project);
+        logger.info("Create new ODI project and folder");
+
+        // Create project
+        project = new OdiProject(PROJECT_DESC, PROJECT_CODE);
+			  folder = new OdiFolder(project, folderName );
+
+        logger.debug("Saving ODI project");
+        // Persist the project and the model
+        entityManager.persist(project);
+
+        return null;
       }
     });
 
