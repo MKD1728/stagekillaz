@@ -38,6 +38,7 @@ import oracle.odi.core.persistence.transaction.support.TransactionTemplate;
 import oracle.odi.domain.finder.IFinder;
 import oracle.odi.domain.project.OdiFolder;
 import oracle.odi.domain.project.OdiProject;
+import oracle.odi.domain.project.finder.IOdiFolderFinder;
 import oracle.odi.domain.project.finder.IOdiProjectFinder;
 import org.w3c.dom.Document;
 
@@ -56,23 +57,23 @@ public class Manager
   protected boolean isODIConnected;
   /** Project handler in ODI */
   protected OdiProject project;
-  /** ODI Folder name */
-  protected String folderName;
+  /** External configuration values, like ODI Folder and xml-reference path */
+  ConfigurationArgs configurationArgs;
   /** ODI Folder handler */
   protected OdiFolder folder;
 
-  static final String PROJECT_DESC = "Migrated DataStage Jobs";
-  static final String PROJECT_CODE = "PROJECT_DS";
+  public static final String PROJECT_DESC = "Migrated DataStage Jobs";
+  public static final String PROJECT_CODE = "PROJECT_DS";
 
   /* log4j logger */
-  static Logger logger = Logger.getLogger(Manager.class);
+  private static Logger logger = Logger.getLogger(Manager.class);
 
-  public Manager(Document dse, ConnectionArgs ca, String fn)
+  public Manager(Document dse, ConnectionArgs ca, ConfigurationArgs confArgs)
   {
     dsExport = dse;
     connectionArgs = ca;
     isODIConnected = false;
-    folderName = fn;
+    configurationArgs = confArgs;
   }
 
   public void run() throws KillaException
@@ -89,6 +90,10 @@ public class Manager
       // 3. Generate variables
       Variables.storeVariables(dsExport, odiInstanceHandle, project, folder);
 
+      // 4. Load KMs
+      KnownledgeModules.addInterfaces(odiInstanceHandle,configurationArgs);
+
+      
     } catch (Exception exc) {
       if (exc instanceof KillaException)
         throw (KillaException) exc;
@@ -111,21 +116,26 @@ public class Manager
       public Object doInTransaction(ITransactionStatus pStatus)
       {
         IOdiEntityManager entityManager = odiInstance.getTransactionalEntityManager();
+        String folderName = configurationArgs.getFolderName();
 
-        logger.info("Check if the project already exists");
+        logger.debug("Check if the project already exists");
 
         // Open project
         project = ((IOdiProjectFinder)entityManager.getFinder(OdiProject.class)).findByCode(PROJECT_CODE);
-        if (project != null)
-          return null;
+        if (project == null) {
+          // Create project
+          logger.info("Create new ODI project: " + PROJECT_DESC);
+          project = new OdiProject(PROJECT_DESC, PROJECT_CODE);
+        }
 
-        logger.info("Create new ODI project and folder");
+        if (((IOdiFolderFinder) entityManager.getFinder(OdiFolder.class)).findByName(folderName).isEmpty()) {
+          logger.info("Create new ODI project folder: " + folderName);
+          folder = new OdiFolder(project, folderName);
+        } else {
+          folder = (OdiFolder) (((IOdiFolderFinder) entityManager.getFinder(OdiFolder.class)).findByName(folderName).toArray())[0];
+        }
 
-        // Create project
-        project = new OdiProject(PROJECT_DESC, PROJECT_CODE);
-			  folder = new OdiFolder(project, folderName );
-
-        logger.debug("Saving ODI project");
+        logger.debug("Saving ODI project and folder");
         // Persist the project and the model
         entityManager.persist(project);
 

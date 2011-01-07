@@ -24,6 +24,7 @@
  */
 package com.starschema.stagekillaz;
 
+import com.starschema.stagekillaz.ODI.ConfigurationArgs;
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 import org.apache.log4j.Logger;
@@ -34,8 +35,6 @@ import org.w3c.dom.Document;
 
 public class StageKillaz
 {
-	private static final String DEFAULT_FOLDER = "Migrated jobs";
-
   static StageKillaz stageKillaz;
   static Logger logger = Logger.getLogger(StageKillaz.class);
 
@@ -60,14 +59,14 @@ public class StageKillaz
   public void execute(String[] args)
   {
     String inputFile = null;
-    String folderName = DEFAULT_FOLDER;
+    ConfigurationArgs confArgs = new ConfigurationArgs();
     ConnectionArgs connectionArgs = new ConnectionArgs();
 
     // Configure logger
     BasicConfigurator.configure();
 
     // Configure longop
-    LongOpt[] longopts = new LongOpt[10];
+    LongOpt[] longopts = new LongOpt[11];
     StringBuffer sb = new StringBuffer();
     longopts[0] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
     longopts[1] = new LongOpt("inputfile", LongOpt.REQUIRED_ARGUMENT, sb, 'i');
@@ -79,6 +78,7 @@ public class StageKillaz
     longopts[7] = new LongOpt("odiuser", LongOpt.REQUIRED_ARGUMENT, sb, 'u');
     longopts[8] = new LongOpt("odipassword", LongOpt.REQUIRED_ARGUMENT, sb, 'p');
     longopts[9] = new LongOpt("folder", LongOpt.REQUIRED_ARGUMENT, sb, 'f');
+    longopts[10] = new LongOpt("kmpath", LongOpt.REQUIRED_ARGUMENT, sb, 'k');
 
     Getopt g = new Getopt("stagekillaz", args, "-hi:r:d:s:a:n:u:p:f:", longopts);
     int c;
@@ -109,7 +109,9 @@ public class StageKillaz
       } else if (c == 'p') {
         connectionArgs.setOdiPassword(g.getOptarg());
       } else if (c == 'f') {
-        folderName = g.getOptarg();
+        confArgs.setFolderName( g.getOptarg() );
+      } else if (c == 'k') {
+        confArgs.setRootKMPath( g.getOptarg() );
       }
     } // while
 
@@ -139,7 +141,7 @@ public class StageKillaz
     }
 
     // Managers
-    Manager odiMgr = new Manager(dsExport, connectionArgs,folderName);
+    Manager odiMgr = new Manager(dsExport, connectionArgs,confArgs);
     try {
       // Generate ODI project
       odiMgr.run();
@@ -157,19 +159,20 @@ public class StageKillaz
   static void help()
   {
     System.out.println();
-    System.out.println("Usage: stagekillaz [-h] --OPTION1=VALUE1 ... --OPTIONn=VALUEn ");
+    System.out.println("Usage: stagekillaz [-h] -OPT1 VALUE1 --LONGOPT2=VALUE2 ... --OPTIONn=VALUEn ");
     System.out.println();
     System.out.println("Options: ");
 
-    System.out.println("\thelp\t\tThis short help message");
-    System.out.println("\tinputfile\tDataStage export file");
-    System.out.println("\treposurl\tODI repository's jdbc URL");
-    System.out.println("\treposdriver\tJDBC Driver class");
-    System.out.println("\treposuser\tDatabase user for master repo");
-    System.out.println("\trepospassword\tDatabase password for master repo");
-    System.out.println("\treposname\tWorking repository name (optional)");
-    System.out.println("\todiuser\t\tODI user name");
-    System.out.println("\todipassword\tODI password");
-    System.out.println("\tfolder\tFolder in ODI project (optional)");
+    System.out.println("  -h | --help\t\tThis short help message");
+    System.out.println("  -i | --inputfile\tDataStage export file");
+    System.out.println("  -r | --reposurl\tODI repository's jdbc URL");
+    System.out.println("  -d | --reposdriver\tJDBC Driver class");
+    System.out.println("  -s | --reposuser\tDatabase user for master repo");
+    System.out.println("  -a | --repospassword\tDatabase password for master repo");
+    System.out.println("  -n | --reposname\tWorking repository name (optional)");
+    System.out.println("  -u | --odiuser\tODI user name");
+    System.out.println("  -p | --odipassword\tODI password");
+    System.out.println("  -f | --folder\t\tFolder in ODI project (optional)");
+    System.out.println("  -k | --kmpath\t\tPath to ODI's xml-reference directory (optional)");
   }
 }

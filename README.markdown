@@ -17,18 +17,20 @@ The following conversions could be avaialble:
 Usage
 -----
 
-Usage: stagekillaz [-h] --OPTION1=VALUE1 ... --OPTIONn=VALUEn
+Usage: stagekillaz [-h] -OPT1 VALUE1 --LONGOPT2=VALUE2 ... --OPTIONn=VALUEn
 
 Options:
-        help            This short help message
-        inputfile       DataStage export file
-        reposurl        ODI repository's jdbc URL
-        reposdriver     JDBC Driver class
-        reposuser       Database user for master repo
-        repospassword   Database password for master repo
-        reposname       Working repository name (optional)
-        odiuser         ODI user name
-        odipassword     ODI password
+    -h | --help           This short help message
+    -i | --inputfile      DataStage export file
+    -r | --reposurl       ODI repository's jdbc URL
+    -d | --reposdriver    JDBC Driver class
+    -s | --reposuser      Database user for master repo
+    -a | --repospassword  Database password for master repo
+    -n | --reposname      Working repository name (optional)
+    -u | --odiuser        ODI user name
+    -p | --odipassword    ODI password
+    -f | --folder         Folder in ODI project (optional)
+    -k | --kmpath         Path to ODI's xml-reference directory (optional)
 
 Credits
 -------

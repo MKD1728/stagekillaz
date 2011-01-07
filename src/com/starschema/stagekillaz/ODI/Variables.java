@@ -28,15 +28,14 @@ package com.starschema.stagekillaz.ODI;
 import com.starschema.stagekillaz.DataStageReader;
 import com.starschema.stagekillaz.KillaException;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.apache.log4j.Logger;
 // ODI
-import oracle.odi.core.config.OdiConfigurationException;
-import oracle.odi.core.security.AuthenticationException;
-import oracle.odi.core.OdiInstance;
 import oracle.odi.core.persistence.IOdiEntityManager;
 import oracle.odi.core.persistence.transaction.ITransactionStatus;
 import oracle.odi.core.persistence.transaction.support.ITransactionCallback;
@@ -44,9 +43,7 @@ import oracle.odi.core.persistence.transaction.support.TransactionTemplate;
 import oracle.odi.domain.project.OdiFolder;
 import oracle.odi.domain.project.OdiProject;
 import oracle.odi.domain.project.OdiVariable;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import oracle.odi.domain.project.finder.IOdiVariableFinder;
 
 public class Variables
 {
@@ -78,12 +75,17 @@ public class Variables
 
           public Object doInTransaction(ITransactionStatus pStatus)
           {
+            OdiVariable var = null;
             IOdiEntityManager entityManager = odiInstanceHandle.getOdiInstance().getTransactionalEntityManager();
-
+  
             logger.info("Adding parameter " + name + " (prompt: " + prompt + ", default: "
                     + def + ")");
 
-            OdiVariable var = new OdiVariable(project, name);
+            var = ((IOdiVariableFinder) entityManager.getFinder(OdiVariable.class)).findByName(name, Manager.PROJECT_CODE);
+            if (var == null) {
+              var = new OdiVariable(project, name);
+            }
+
             var.setDefaultValue(def);
             var.setDescription(prompt);
 
